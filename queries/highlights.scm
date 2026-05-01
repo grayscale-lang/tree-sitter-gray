@@ -15,6 +15,9 @@
   "${" @string.special
   "}" @string.special)
 
+; Escape sequences
+(escape_sequence) @string.escape
+
 ; Numbers
 (integer) @number
 (float) @number
@@ -34,7 +37,7 @@
 
 ; Keywords
 [
-  "temp"
+  "mut"
   "const"
   "do"
   "return"
@@ -44,11 +47,13 @@
   "for"
   "for_each"
   "as_long_as"
+  "while"
   "loop"
   "in"
   "not_in"
   "range"
   "import"
+  "and"
   "using"
   "use"
   "struct"
@@ -60,6 +65,7 @@
   "module"
   "private"
   "ensure"
+  "or_return"
 ] @keyword
 
 ; Break and continue are named nodes
@@ -92,9 +98,9 @@
   "map"
 ] @type.builtin
 
-; Builtin types that are identifiers (File, Database, Error)
+; Builtin types that are identifiers (runtime/stdlib types)
 ((identifier) @type.builtin
-  (#match? @type.builtin "^(File|Database|Error)$"))
+  (#match? @type.builtin "^(File|Database|Error|HttpResponse|HttpRequest|Thread|Mutex|Channel|Arena|SpinLock|Socket|Listener|Router)$"))
 
 ; Type annotations - user defined types
 (type (identifier) @type.builtin)
@@ -120,6 +126,7 @@
   "||"
   "!"
   "&"
+  "^"
   "++"
   "--"
   "+="
@@ -151,11 +158,12 @@
   ","
   "."
   ":"
+  "#"
 ] @punctuation.delimiter
 
 ; Attributes - use preprocessor/tag color (distinct from functions)
 (attribute
-  (identifier) @tag)
+  name: (identifier) @tag)
 
 ; Import statements
 (import_statement) @keyword
@@ -165,6 +173,10 @@
 (import_path
   "@" @punctuation.special
   (identifier) @namespace)
+
+; Import alias
+(import_statement
+  alias: (identifier) @namespace)
 
 ; Module declarations (module mymodule)
 (module_declaration
@@ -178,14 +190,23 @@
 (function_declaration
   name: (identifier) @function.definition)
 
+; Struct function definitions (functions inside struct bodies)
+(struct_declaration
+  (function_declaration
+    name: (identifier) @function.definition))
+
 ; Built-in function calls
 (call_expression
   function: (identifier) @function.builtin
-  (#match? @function.builtin "^(len|typeof|copy|error|exit|panic|assert|ref|append|input|read_int|cast|range)$"))
+  (#match? @function.builtin "^(len|typeof|copy|error|exit|panic|assert|ref|append|input|read_int|cast|range|addr|println|print|eprintln|eprint|sleep_s|sleep_ms|sleep_ns|to_char|char_count|c_string|i128|u128|i256|u256|size_of)$"))
 
 ; Function calls
 (call_expression
   function: (identifier) @function.call)
+
+; Function references ()name
+(func_ref
+  (identifier) @function.call)
 
 ; Struct definitions - type color
 (struct_declaration
@@ -203,6 +224,10 @@
 (variable_declaration
   (identifier) @variable)
 
+; Named return values
+(named_return
+  name: (identifier) @variable.parameter)
+
 ; Parameters
 (parameter
   name: (identifier) @variable.parameter)
@@ -218,3 +243,14 @@
 ; Struct field initialization
 (struct_field
   (identifier) @variable.member)
+
+; Postfix operators
+(postfix_expression
+  ["++" "--" "^"] @operator)
+
+; Pointer type caret
+(pointer_type
+  "^" @operator)
+
+; Wildcard type
+(wildcard_type) @type.builtin

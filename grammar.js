@@ -16,6 +16,7 @@ module.exports = grammar({
     [$.block, $.array_literal, $.map_literal],
     [$.expression_statement, $.array_literal],
     [$.expression_statement, $.map_literal],
+    [$.named_return, $.type],
   ],
 
   rules: {
@@ -54,6 +55,7 @@ module.exports = grammar({
     // Import statements
     import_statement: $ => seq(
       'import',
+      optional(field('alias', $.identifier)),
       choice(
         $.import_path,
         seq($.import_path, repeat(seq(',', $.import_path))),
@@ -61,8 +63,9 @@ module.exports = grammar({
     ),
 
     import_path: $ => choice(
-      seq('@', $.identifier),  // @std
-      seq('"', /[^"]+/, '"'),  // "path/to/module"
+      seq('@', $.identifier),           // @std
+      seq('"', /[^"]+/, '"'),           // "path/to/module"
+      seq('c', '"', /[^"]+/, '"'),      // c"header.h"
     ),
 
     using_statement: $ => seq(
@@ -73,7 +76,7 @@ module.exports = grammar({
 
     import_and_use_statement: $ => seq(
       'import',
-      '&',
+      'and',
       'use',
       choice(
         $.import_path,
@@ -84,7 +87,7 @@ module.exports = grammar({
     // Variable declaration
     variable_declaration: $ => seq(
       optional('private'),
-      choice('temp', 'const'),
+      choice('mut', 'const'),
       $.identifier,
       optional($.type),
       optional(seq('=', $._expression)),
@@ -110,22 +113,29 @@ module.exports = grammar({
     parameter: $ => seq(
       optional('&'),
       field('name', $.identifier),
+      repeat(seq(',', optional('&'), field('name', $.identifier))),
       field('type', $.type),
       optional(seq('=', $._expression)),
     ),
 
     return_types: $ => choice(
       $.type,
-      seq('(', $.type, repeat(seq(',', $.type)), ')'),
+      seq('(', $.named_return, repeat(seq(',', $.named_return)), ')'),
+    ),
+
+    named_return: $ => seq(
+      optional(seq(field('name', $.identifier), repeat(seq(',', field('name', $.identifier))))),
+      field('type', $.type),
     ),
 
     // Struct declaration
     struct_declaration: $ => seq(
+      repeat($.attribute),
       'const',
       field('name', $.identifier),
       'struct',
       '{',
-      repeat($.field_declaration),
+      repeat(choice($.field_declaration, $.function_declaration)),
       '}',
     ),
 
@@ -136,7 +146,7 @@ module.exports = grammar({
 
     // Enum declaration
     enum_declaration: $ => seq(
-      optional($.attribute),
+      repeat($.attribute),
       'const',
       field('name', $.identifier),
       'enum',
@@ -151,11 +161,9 @@ module.exports = grammar({
     ),
 
     attribute: $ => seq(
-      '@',
-      '(',
-      $.identifier,
-      repeat(seq(',', $._expression)),
-      ')',
+      '#',
+      field('name', $.identifier),
+      optional(seq('(', $._expression, ')')),
     ),
 
     // Control flow
@@ -193,6 +201,7 @@ module.exports = grammar({
       'for_each',
       optional('('),
       $.identifier,
+      optional(seq(',', $.identifier)),
       optional($.type),
       'in',
       $._expression,
@@ -201,7 +210,7 @@ module.exports = grammar({
     ),
 
     as_long_as_statement: $ => seq(
-      'as_long_as',
+      choice('as_long_as', 'while'),
       $._expression,
       $.block,
     ),
@@ -213,7 +222,7 @@ module.exports = grammar({
 
     // When statement (switch/match equivalent)
     when_statement: $ => seq(
-      optional($.attribute),
+      repeat($.attribute),
       'when',
       $._expression,
       '{',
@@ -279,10 +288,13 @@ module.exports = grammar({
       $.member_expression,
       $.index_expression,
       $.unary_expression,
+      $.postfix_expression,
       $.binary_expression,
       $.grouped_expression,
       $.new_expression,
       $.range_expression,
+      $.or_return_expression,
+      $.func_ref,
     ),
 
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
@@ -313,7 +325,7 @@ module.exports = grammar({
 
     string_content: $ => /[^"\\$]+/,
 
-    escape_sequence: $ => /\\[nrt\\'"0]/,
+    escape_sequence: $ => /\\[nrt\\'"0]|\\x[0-9a-fA-F]{2}/,
 
     interpolation: $ => seq(
       '${',
@@ -389,8 +401,13 @@ module.exports = grammar({
     )),
 
     unary_expression: $ => prec.right(4, seq(
-      choice('-', '!', '++', '--'),
+      choice('-', '!'),
       $._expression,
+    )),
+
+    postfix_expression: $ => prec.left(5, seq(
+      $._expression,
+      choice('++', '--', '^'),
     )),
 
     binary_expression: $ => choice(
@@ -420,13 +437,29 @@ module.exports = grammar({
       ')',
     ),
 
+    or_return_expression: $ => prec.right(seq(
+      $._expression,
+      'or_return',
+      optional($._expression),
+    )),
+
+    func_ref: $ => seq(
+      '(',
+      ')',
+      $.identifier,
+    ),
+
     // Types
     type: $ => choice(
       $.primitive_type,
       $.array_type,
       $.map_type,
+      $.pointer_type,
+      $.wildcard_type,
       $.identifier,  // user-defined types
     ),
+
+    wildcard_type: $ => '?',
 
     primitive_type: $ => choice(
       'int', 'i8', 'i16', 'i32', 'i64', 'i128', 'i256',
@@ -449,6 +482,11 @@ module.exports = grammar({
       ':',
       $.type,
       ']',
+    ),
+
+    pointer_type: $ => seq(
+      '^',
+      $.type,
     ),
 
     // Comments

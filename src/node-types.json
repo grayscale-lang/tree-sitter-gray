@@ -28,6 +28,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -57,6 +61,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -134,6 +146,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -163,6 +179,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -217,6 +241,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -246,6 +274,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -274,10 +310,21 @@
   {
     "type": "attribute",
     "named": true,
-    "fields": {},
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
-      "multiple": true,
-      "required": true,
+      "multiple": false,
+      "required": false,
       "types": [
         {
           "type": "array_literal",
@@ -297,6 +344,10 @@
         },
         {
           "type": "char_literal",
+          "named": true
+        },
+        {
+          "type": "func_ref",
           "named": true
         },
         {
@@ -329,6 +380,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -383,6 +442,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -412,6 +475,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -566,6 +637,10 @@
             "named": true
           },
           {
+            "type": "func_ref",
+            "named": true
+          },
+          {
             "type": "grouped_expression",
             "named": true
           },
@@ -595,6 +670,14 @@
           },
           {
             "type": "number",
+            "named": true
+          },
+          {
+            "type": "or_return_expression",
+            "named": true
+          },
+          {
+            "type": "postfix_expression",
             "named": true
           },
           {
@@ -645,6 +728,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -674,6 +761,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -803,6 +898,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -832,6 +931,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -886,6 +993,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -915,6 +1026,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -999,6 +1118,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1028,6 +1151,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -1090,6 +1221,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1122,6 +1257,14 @@
           "named": true
         },
         {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
+          "named": true
+        },
+        {
           "type": "range_expression",
           "named": true
         },
@@ -1143,6 +1286,21 @@
         },
         {
           "type": "unary_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "func_ref",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "identifier",
           "named": true
         }
       ]
@@ -1211,6 +1369,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1240,6 +1402,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -1298,6 +1468,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1334,7 +1508,15 @@
           "named": true
         },
         {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
           "type": "otherwise_clause",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -1393,7 +1575,18 @@
   {
     "type": "import_statement",
     "named": true,
-    "fields": {},
+    "fields": {
+      "alias": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
@@ -1434,6 +1627,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1463,6 +1660,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -1522,6 +1727,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1551,6 +1760,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -1609,6 +1826,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1638,6 +1859,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -1707,6 +1936,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1736,6 +1969,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -1831,6 +2072,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -1860,6 +2105,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -1895,6 +2148,32 @@
         "types": [
           {
             "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
+  },
+  {
+    "type": "named_return",
+    "named": true,
+    "fields": {
+      "name": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "type",
             "named": true
           }
         ]
@@ -1979,6 +2258,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -2008,6 +2291,109 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
+          "named": true
+        },
+        {
+          "type": "range_expression",
+          "named": true
+        },
+        {
+          "type": "raw_string",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "struct_literal",
+          "named": true
+        },
+        {
+          "type": "unary_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "or_return_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "array_literal",
+          "named": true
+        },
+        {
+          "type": "binary_expression",
+          "named": true
+        },
+        {
+          "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "call_expression",
+          "named": true
+        },
+        {
+          "type": "char_literal",
+          "named": true
+        },
+        {
+          "type": "func_ref",
+          "named": true
+        },
+        {
+          "type": "grouped_expression",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "index_expression",
+          "named": true
+        },
+        {
+          "type": "map_literal",
+          "named": true
+        },
+        {
+          "type": "member_expression",
+          "named": true
+        },
+        {
+          "type": "new_expression",
+          "named": true
+        },
+        {
+          "type": "nil",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -2053,7 +2439,7 @@
     "named": true,
     "fields": {
       "name": {
-        "multiple": false,
+        "multiple": true,
         "required": true,
         "types": [
           {
@@ -2098,6 +2484,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -2127,6 +2517,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -2168,6 +2566,116 @@
     }
   },
   {
+    "type": "pointer_type",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "type",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "postfix_expression",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "array_literal",
+          "named": true
+        },
+        {
+          "type": "binary_expression",
+          "named": true
+        },
+        {
+          "type": "boolean",
+          "named": true
+        },
+        {
+          "type": "call_expression",
+          "named": true
+        },
+        {
+          "type": "char_literal",
+          "named": true
+        },
+        {
+          "type": "func_ref",
+          "named": true
+        },
+        {
+          "type": "grouped_expression",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "index_expression",
+          "named": true
+        },
+        {
+          "type": "map_literal",
+          "named": true
+        },
+        {
+          "type": "member_expression",
+          "named": true
+        },
+        {
+          "type": "new_expression",
+          "named": true
+        },
+        {
+          "type": "nil",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
+          "named": true
+        },
+        {
+          "type": "range_expression",
+          "named": true
+        },
+        {
+          "type": "raw_string",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "struct_literal",
+          "named": true
+        },
+        {
+          "type": "unary_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "primitive_type",
     "named": true,
     "fields": {}
@@ -2201,6 +2709,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -2230,6 +2742,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -2289,6 +2809,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -2318,6 +2842,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -2351,6 +2883,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "named_return",
+          "named": true
+        },
         {
           "type": "type",
           "named": true
@@ -2497,7 +3033,15 @@
       "required": false,
       "types": [
         {
+          "type": "attribute",
+          "named": true
+        },
+        {
           "type": "field_declaration",
+          "named": true
+        },
+        {
+          "type": "function_declaration",
           "named": true
         }
       ]
@@ -2532,6 +3076,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -2561,6 +3109,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -2626,7 +3182,15 @@
           "named": true
         },
         {
+          "type": "pointer_type",
+          "named": true
+        },
+        {
           "type": "primitive_type",
+          "named": true
+        },
+        {
+          "type": "wildcard_type",
           "named": true
         }
       ]
@@ -2661,6 +3225,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -2690,6 +3258,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -2759,6 +3335,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -2788,6 +3368,14 @@
         },
         {
           "type": "number",
+          "named": true
+        },
+        {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
           "named": true
         },
         {
@@ -2854,6 +3442,10 @@
           "named": true
         },
         {
+          "type": "func_ref",
+          "named": true
+        },
+        {
           "type": "grouped_expression",
           "named": true
         },
@@ -2890,6 +3482,14 @@
           "named": true
         },
         {
+          "type": "or_return_expression",
+          "named": true
+        },
+        {
+          "type": "postfix_expression",
+          "named": true
+        },
+        {
           "type": "range_expression",
           "named": true
         },
@@ -2922,6 +3522,10 @@
   },
   {
     "type": "\"",
+    "named": false
+  },
+  {
+    "type": "#",
     "named": false
   },
   {
@@ -3049,7 +3653,15 @@
     "named": false
   },
   {
+    "type": "^",
+    "named": false
+  },
+  {
     "type": "`",
+    "named": false
+  },
+  {
+    "type": "and",
     "named": false
   },
   {
@@ -3071,6 +3683,10 @@
   },
   {
     "type": "byte",
+    "named": false
+  },
+  {
+    "type": "c",
     "named": false
   },
   {
@@ -3199,6 +3815,10 @@
     "named": false
   },
   {
+    "type": "mut",
+    "named": false
+  },
+  {
     "type": "new",
     "named": false
   },
@@ -3212,6 +3832,10 @@
   },
   {
     "type": "or",
+    "named": false
+  },
+  {
+    "type": "or_return",
     "named": false
   },
   {
@@ -3240,10 +3864,6 @@
   },
   {
     "type": "struct",
-    "named": false
-  },
-  {
-    "type": "temp",
     "named": false
   },
   {
@@ -3289,6 +3909,14 @@
   {
     "type": "when",
     "named": false
+  },
+  {
+    "type": "while",
+    "named": false
+  },
+  {
+    "type": "wildcard_type",
+    "named": true
   },
   {
     "type": "{",
