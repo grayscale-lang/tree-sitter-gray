@@ -35,6 +35,10 @@
 ((identifier) @constant.builtin
   (#match? @constant.builtin "^(EXIT_SUCCESS|EXIT_FAILURE)$"))
 
+; Blank identifier
+((identifier) @variable.builtin
+  (#eq? @variable.builtin "_"))
+
 ; Keywords
 [
   "mut"
@@ -66,7 +70,18 @@
   "private"
   "ensure"
   "or_return"
+  "cast"
 ] @keyword
+
+; Bitwise keyword operators
+[
+  "bit_and"
+  "bit_or"
+  "bit_xor"
+  "bit_not"
+  "bit_shift_left"
+  "bit_shift_right"
+] @keyword.operator
 
 ; Break and continue are named nodes
 (break_statement) @keyword
@@ -96,6 +111,7 @@
   "byte"
   "string"
   "map"
+  "func"
 ] @type.builtin
 
 ; Builtin types that are identifiers (runtime/stdlib types)
@@ -133,6 +149,7 @@
   "-="
   "*="
   "/="
+  "%="
   "->"
 ] @operator
 
@@ -198,7 +215,11 @@
 ; Built-in function calls
 (call_expression
   function: (identifier) @function.builtin
-  (#match? @function.builtin "^(len|typeof|copy|error|exit|panic|assert|ref|append|input|read_int|cast|range|addr|println|print|eprintln|eprint|sleep_s|sleep_ms|sleep_ns|to_char|char_count|c_string|i128|u128|i256|u256|size_of)$"))
+  (#match? @function.builtin "^(len|type_of|copy|error|exit|panic|assert|ref|append|input|read_int|range|addr|println|print|eprintln|eprint|sleep_s|sleep_ms|sleep_ns|to_char|char_count|c_string|i128|u128|i256|u256|size_of)$"))
+
+; cast is a dedicated expression node - highlight keyword portion
+(cast_expression
+  "cast" @function.builtin)
 
 ; Function calls
 (call_expression

@@ -11,11 +11,9 @@ module.exports = grammar({
 
   conflicts: $ => [
     [$.struct_literal, $._expression],
-    [$.array_literal, $.map_literal],
     [$.variable_declaration],
-    [$.block, $.array_literal, $.map_literal],
+    [$.block, $.array_literal],
     [$.expression_statement, $.array_literal],
-    [$.expression_statement, $.map_literal],
     [$.named_return, $.type],
   ],
 
@@ -234,6 +232,7 @@ module.exports = grammar({
     is_clause: $ => seq(
       'is',
       $._expression,
+      repeat(seq(',', $._expression)),
       $.block,
     ),
 
@@ -251,8 +250,8 @@ module.exports = grammar({
 
     continue_statement: $ => 'continue',
 
-    // Ensure statement (like defer - runs on function exit)
-    ensure_statement: $ => prec(10, seq(
+    // Ensure statement (runs on function exit, like defer)
+    ensure_statement: $ => prec(11, seq(
       'ensure',
       $.call_expression,
     )),
@@ -285,6 +284,7 @@ module.exports = grammar({
       $.map_literal,
       $.struct_literal,
       $.call_expression,
+      $.cast_expression,
       $.member_expression,
       $.index_expression,
       $.unary_expression,
@@ -355,9 +355,13 @@ module.exports = grammar({
       '}',
     ),
 
+    // {:} is the empty map literal; non-empty maps have key:value entries
     map_literal: $ => seq(
       '{',
-      optional(seq($.map_entry, repeat(seq(',', $.map_entry)))),
+      choice(
+        seq($.map_entry, repeat(seq(',', $.map_entry))),
+        ':',
+      ),
       '}',
     ),
 
@@ -380,42 +384,57 @@ module.exports = grammar({
       $._expression,
     ),
 
-    call_expression: $ => prec(2, seq(
+    call_expression: $ => prec(11, seq(
       field('function', $._expression),
       '(',
       optional(seq($._expression, repeat(seq(',', $._expression)))),
       ')',
     )),
 
-    member_expression: $ => prec.left(3, seq(
+    // cast(value, type) or cast(value, [type])
+    cast_expression: $ => prec(11, seq(
+      'cast',
+      '(',
+      $._expression,
+      ',',
+      choice($.array_type, $.type),
+      ')',
+    )),
+
+    member_expression: $ => prec.left(12, seq(
       $._expression,
       '.',
       field('property', $.identifier),
     )),
 
-    index_expression: $ => prec.left(3, seq(
+    index_expression: $ => prec.left(12, seq(
       $._expression,
       '[',
       $._expression,
       ']',
     )),
 
-    unary_expression: $ => prec.right(4, seq(
-      choice('-', '!'),
+    unary_expression: $ => prec.right(10, seq(
+      choice('-', '!', 'bit_not'),
       $._expression,
     )),
 
-    postfix_expression: $ => prec.left(5, seq(
+    postfix_expression: $ => prec.left(13, seq(
       $._expression,
       choice('++', '--', '^'),
     )),
 
+    // Precedence levels match the EZ parser (PREC_OR=1 through PREC_PRODUCT=9)
     binary_expression: $ => choice(
-      prec.left(1, seq($._expression, choice('||'), $._expression)),
-      prec.left(2, seq($._expression, choice('&&'), $._expression)),
-      prec.left(3, seq($._expression, choice('==', '!=', '<', '>', '<=', '>=', 'in', 'not_in'), $._expression)),
-      prec.left(4, seq($._expression, choice('+', '-'), $._expression)),
-      prec.left(5, seq($._expression, choice('*', '/', '%'), $._expression)),
+      prec.left(1, seq($._expression, '||',                                    $._expression)),
+      prec.left(2, seq($._expression, '&&',                                    $._expression)),
+      prec.left(3, seq($._expression, choice('==', '!='),                      $._expression)),
+      prec.left(4, seq($._expression, choice('bit_and', 'bit_or', 'bit_xor'), $._expression)),
+      prec.left(5, seq($._expression, choice('<', '>', '<=', '>='),            $._expression)),
+      prec.left(6, seq($._expression, choice('in', 'not_in'),                  $._expression)),
+      prec.left(7, seq($._expression, choice('bit_shift_left', 'bit_shift_right'), $._expression)),
+      prec.left(8, seq($._expression, choice('+', '-'),                        $._expression)),
+      prec.left(9, seq($._expression, choice('*', '/', '%'),                   $._expression)),
     ),
 
     grouped_expression: $ => seq('(', $._expression, ')'),
@@ -466,6 +485,7 @@ module.exports = grammar({
       'uint', 'u8', 'u16', 'u32', 'u64', 'u128', 'u256',
       'float', 'f32', 'f64',
       'bool', 'char', 'byte', 'string',
+      'func',
     ),
 
     array_type: $ => seq(
