@@ -1,7 +1,7 @@
 {
   "targets": [
     {
-      "target_name": "tree_sitter_ez_binding",
+      "target_name": "tree_sitter_gray_binding",
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
         "src"

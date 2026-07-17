@@ -1,12 +1,12 @@
 {
-  "name": "tree-sitter-ez",
+  "name": "tree-sitter-gray",
   "version": "0.1.0",
-  "description": "Tree-sitter grammar for the EZ programming language",
+  "description": "Tree-sitter grammar for the Grayscale programming language",
   "main": "bindings/node",
   "keywords": [
     "parser",
     "tree-sitter",
-    "ez"
+    "gray"
   ],
   "author": "Marshall Burns",
   "license": "MIT",
@@ -22,11 +22,11 @@
   },
   "tree-sitter": [
     {
-      "scope": "source.ez",
+      "scope": "source.gray",
       "file-types": [
-        "ez"
+        "gray"
       ],
-      "injection-regex": "^ez$"
+      "injection-regex": "^gray$"
     }
   ]
 }
