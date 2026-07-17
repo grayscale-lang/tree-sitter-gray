@@ -2,17 +2,17 @@
   "metadata": {
     "version": "0.1.0",
     "license": "MIT",
-    "description": "Tree-sitter grammar for the EZ programming language",
+    "description": "Tree-sitter grammar for the Grayscale programming language",
     "authors": [
       { "name": "Marshall Burns" }
     ]
   },
   "grammars": [
     {
-      "name": "ez",
-      "scope": "source.ez",
+      "name": "gray",
+      "scope": "source.gray",
       "path": ".",
-      "file-types": ["ez"]
+      "file-types": ["gray"]
     }
   ]
 }

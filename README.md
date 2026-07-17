@@ -1,10 +1,10 @@
-# tree-sitter-ez
+# tree-sitter-gray
 
-Tree-sitter grammar for the [EZ programming language](https://github.com/SchoolyB/EZ).
+Tree-sitter grammar for the [Grayscale programming language](https://github.com/grayscale-lang/Grayscale).
 
 ## Usage
 
-This grammar is used by [ez-syntax](https://github.com/SchoolyB/ez-syntax) for syntax highlighting in Zed.
+This grammar is used by [GrayLS](https://github.com/grayscale-lang/grayls) for syntax highlighting in Zed.
 
 ## Updating the Grammar
 
@@ -25,7 +25,7 @@ npm install -g tree-sitter-cli
 
 3. Test parsing (optional):
    ```bash
-   tree-sitter parse path/to/file.ez
+   tree-sitter parse path/to/file.gray
    ```
 
 4. Commit and push:
@@ -35,7 +35,7 @@ npm install -g tree-sitter-cli
    git push
    ```
 
-5. Update [ez-syntax](https://github.com/SchoolyB/ez-syntax) with the new commit SHA
+5. Update [GrayLS](https://github.com/grayscale-lang/grayls) with the new commit SHA
 
 ## Structure
 
@@ -47,5 +47,5 @@ npm install -g tree-sitter-cli
 
 ## Related
 
-- [EZ Programming Language](https://github.com/SchoolyB/EZ)
-- [ez-syntax](https://github.com/SchoolyB/ez-syntax) - Zed extension using this grammar
+- [Grayscale Programming Language](https://github.com/grayscale-lang/Grayscale)
+- [GrayLS](https://github.com/grayscale-lang/grayls) - Language server using this grammar

@@ -1,5 +1,5 @@
 module.exports = grammar({
-  name: 'ez',
+  name: 'gray',
 
   extras: $ => [
     /\s/,
@@ -424,7 +424,7 @@ module.exports = grammar({
       choice('++', '--', '^'),
     )),
 
-    // Precedence levels match the EZ parser (PREC_OR=1 through PREC_PRODUCT=9)
+    // Precedence levels match the Grayscale parser (PREC_OR=1 through PREC_PRODUCT=9)
     binary_expression: $ => choice(
       prec.left(1, seq($._expression, '||',                                    $._expression)),
       prec.left(2, seq($._expression, '&&',                                    $._expression)),
