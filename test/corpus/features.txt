@@ -138,7 +138,8 @@ do make(T <?>) -> ^? {
     (block
       (return_statement
         (new_expression
-          type: (identifier))))))
+          type: (type
+            (identifier)))))))
 
 ===========================
 Struct field default values
@@ -232,3 +233,303 @@ do main() {
           (named_argument
             name: (identifier)
             value: (boolean)))))))
+
+======================================
+Multi-value declaration and assignment
+======================================
+
+do main() {
+    mut a, b = pair()
+    mut x int, y int = pair(1, 2)
+    mut v, _ = get()
+    c, d = pair()
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (identifier)
+        (call_expression
+          function: (identifier)))
+      (variable_declaration
+        (identifier)
+        (type
+          (primitive_type))
+        (identifier)
+        (type
+          (primitive_type))
+        (call_expression
+          function: (identifier)
+          (number
+            (integer))
+          (number
+            (integer))))
+      (variable_declaration
+        (identifier)
+        (identifier)
+        (call_expression
+          function: (identifier)))
+      (assignment_statement
+        (identifier)
+        (identifier)
+        (call_expression
+          function: (identifier))))))
+
+====================
+Typed func signature
+====================
+
+do apply(f func(int, int) -> int, g func(&int)) {
+    return
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type
+          (func_type
+            (type
+              (primitive_type))
+            (type
+              (primitive_type))
+            (type
+              (primitive_type)))))
+      (parameter
+        name: (identifier)
+        type: (type
+          (func_type
+            (type
+              (primitive_type))))))
+    (block
+      (return_statement))))
+
+================================
+Map type without the map keyword
+================================
+
+do main() {
+    mut ages [string:int] = {"a": 1}
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (type
+          (map_type
+            (type
+              (primitive_type))
+            (type
+              (primitive_type))))
+        (map_literal
+          (map_entry
+            (string
+              (string_content))
+            (number
+              (integer))))))))
+
+=====================
+Module-qualified type
+=====================
+
+do main() {
+    mut tasks [models.Task] = {}
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (type
+          (array_type
+            (type
+              (qualified_type
+                (identifier)
+                (identifier)))))
+        (array_literal)))))
+
+============================================
+Named array size and new with composite type
+============================================
+
+const arr [int, N] = {1, 2, 3}
+
+do main() {
+    mut p = new([int])
+}
+
+---
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (type
+      (array_type
+        (type
+          (primitive_type))
+        (identifier)))
+    (array_literal
+      (number
+        (integer))
+      (number
+        (integer))
+      (number
+        (integer))))
+  (function_declaration
+    name: (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (new_expression
+          type: (type
+            (array_type
+              (type
+                (primitive_type)))))))))
+
+==============================
+For loop with a bare condition
+==============================
+
+do main() {
+    for i < 5 {
+        i += 1
+    }
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (for_statement
+        (binary_expression
+          (identifier)
+          (number
+            (integer)))
+        (block
+          (assignment_statement
+            (identifier)
+            (number
+              (integer))))))))
+
+====================
+Not-in shorthand
+====================
+
+do main() {
+    if 99 !in numbers {
+        println("absent")
+    }
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (if_statement
+        (binary_expression
+          (number
+            (integer))
+          (identifier))
+        (block
+          (expression_statement
+            (call_expression
+              function: (identifier)
+              (string
+                (string_content)))))))))
+
+=========================================
+Trailing commas in enum and struct bodies
+=========================================
+
+const Color enum {
+    RED,
+    GREEN = 2,
+}
+
+const P struct {
+    x int,
+    y int,
+}
+
+---
+
+(source_file
+  (enum_declaration
+    name: (identifier)
+    (enum_value
+      (identifier))
+    (enum_value
+      (identifier)
+      (number
+        (integer))))
+  (struct_declaration
+    name: (identifier)
+    (field_declaration
+      name: (identifier)
+      type: (type
+        (primitive_type)))
+    (field_declaration
+      name: (identifier)
+      type: (type
+        (primitive_type)))))
+
+==========================================
+Comment markers and escapes inside strings
+==========================================
+
+do main() {
+    mut p string = io.dirname("///")
+    mut r string = `a//b`
+    println("literal \${x}")
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (type
+          (primitive_type))
+        (call_expression
+          function: (member_expression
+            (identifier)
+            property: (identifier))
+          (string
+            (string_content))))
+      (variable_declaration
+        (identifier)
+        (type
+          (primitive_type))
+        (raw_string))
+      (expression_statement
+        (call_expression
+          function: (identifier)
+          (string
+            (string_content)
+            (escape_sequence)
+            (string_content)))))))

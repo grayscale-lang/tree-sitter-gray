@@ -54,17 +54,20 @@ module.exports = grammar({
     // Import statements
     import_statement: $ => seq(
       'import',
+      $._import_item,
+      repeat(seq(',', $._import_item)),
+    ),
+
+    // A path may carry its own alias: import m @math, str@strings
+    _import_item: $ => seq(
       optional(field('alias', $.identifier)),
-      choice(
-        $.import_path,
-        seq($.import_path, repeat(seq(',', $.import_path))),
-      ),
+      $.import_path,
     ),
 
     import_path: $ => choice(
       seq('@', $.identifier),           // @std
       seq('"', /[^"]+/, '"'),           // "path/to/module"
-      seq('c', '"', /[^"]+/, '"'),      // c"header.h"
+      prec(2, seq('c', '"', /[^"]+/, '"')),  // c"header.h"
     ),
 
     using_statement: $ => seq(
@@ -77,10 +80,8 @@ module.exports = grammar({
       'import',
       'and',
       'use',
-      choice(
-        $.import_path,
-        seq($.import_path, repeat(seq(',', $.import_path))),
-      ),
+      $._import_item,
+      repeat(seq(',', $._import_item)),
     ),
 
     // Type alias
@@ -98,7 +99,8 @@ module.exports = grammar({
       choice('mut', 'const'),
       $.identifier,
       optional($.type),
-      optional(seq('=', $._expression)),
+      repeat(seq(',', $.identifier, optional($.type))),
+      optional(seq('=', $._expression, repeat(seq(',', $._expression)))),
     ),
 
     // Function declaration
@@ -119,12 +121,16 @@ module.exports = grammar({
       repeat(seq(',', $.parameter)),
     ),
 
-    parameter: $ => seq(
-      optional('&'),
-      field('name', $.identifier),
-      repeat(seq(',', optional('&'), field('name', $.identifier))),
-      field('type', choice($.type, $.type_parameter)),
-      optional(seq('=', $._expression)),
+    parameter: $ => choice(
+      seq(
+        optional('&'),
+        field('name', $.identifier),
+        repeat(seq(',', optional('&'), field('name', $.identifier))),
+        field('type', choice($.type, $.type_parameter)),
+        optional(seq('=', $._expression)),
+      ),
+      // Type inferred from the default: do move(dir = Direction.NORTH)
+      seq(field('name', $.identifier), '=', $._expression),
     ),
 
     // Type parameter annotation: do make(T <?>)
@@ -156,6 +162,7 @@ module.exports = grammar({
       repeat(seq(',', field('name', $.identifier))),
       field('type', $.type),
       optional(seq('=', field('default', $._expression))),
+      optional(','),
     ),
 
     // Enum declaration
@@ -175,6 +182,7 @@ module.exports = grammar({
         $.variant_payload,
         seq('=', $._expression),
       )),
+      optional(','),
     ),
 
     // Tagged enum payload: Circle(float), Rect(float, float)
@@ -211,15 +219,19 @@ module.exports = grammar({
       $.block,
     ),
 
-    for_statement: $ => seq(
-      'for',
-      optional('('),
-      $.identifier,
-      optional($.type),
-      'in',
-      $._expression,
-      optional(')'),
-      $.block,
+    for_statement: $ => choice(
+      prec(2, seq(
+        'for',
+        optional('('),
+        $.identifier,
+        optional($.type),
+        'in',
+        $._expression,
+        optional(')'),
+        $.block,
+      )),
+      // Condition form: for i < 5 { }
+      prec(1, seq('for', $._expression, $.block)),
     ),
 
     for_each_statement: $ => seq(
@@ -286,8 +298,10 @@ module.exports = grammar({
     // Assignment
     assignment_statement: $ => seq(
       $._expression,
+      repeat(seq(',', $._expression)),
       choice('=', '+=', '-=', '*=', '/=', '%='),
       $._expression,
+      repeat(seq(',', $._expression)),
     ),
 
     expression_statement: $ => $._expression,
@@ -347,13 +361,14 @@ module.exports = grammar({
         $.string_content,
         $.escape_sequence,
         $.interpolation,
+        token.immediate('$'),
       )),
       '"',
     ),
 
-    string_content: $ => /[^"\\$]+/,
+    string_content: $ => token.immediate(prec(1, /[^"\\$]+/)),
 
-    escape_sequence: $ => /\\[nrt\\'"0]|\\x[0-9a-fA-F]{2}/,
+    escape_sequence: $ => token.immediate(/\\[nrt\\'"0$]|\\x[0-9a-fA-F]{2}/),
 
     interpolation: $ => seq(
       '${',
@@ -363,7 +378,7 @@ module.exports = grammar({
 
     raw_string: $ => seq(
       '`',
-      /[^`]*/,
+      token.immediate(prec(1, /[^`]*/)),
       '`',
     ),
 
@@ -400,7 +415,7 @@ module.exports = grammar({
     ),
 
     struct_literal: $ => prec.dynamic(1, seq(
-      $.identifier,
+      choice($.identifier, $.member_expression),
       '{',
       optional(seq($.struct_field, repeat(seq(',', $.struct_field)))),
       '}',
@@ -419,7 +434,15 @@ module.exports = grammar({
       ')',
     )),
 
-    _argument: $ => choice($.named_argument, $._expression),
+    _argument: $ => choice(
+      $.named_argument,
+      $._expression,
+      // Type arguments for size_of() and friends; these forms are not
+      // otherwise valid expressions, so they cannot be ambiguous.
+      $.pointer_type,
+      $.array_type,
+      $.map_type,
+    ),
 
     // Named argument at a call site: connect(host: "localhost")
     named_argument: $ => seq(
@@ -474,7 +497,7 @@ module.exports = grammar({
       prec.left(3, seq($._expression, choice('==', '!='),                      $._expression)),
       prec.left(4, seq($._expression, choice('bit_and', 'bit_or', 'bit_xor'), $._expression)),
       prec.left(5, seq($._expression, choice('<', '>', '<=', '>='),            $._expression)),
-      prec.left(6, seq($._expression, choice('in', 'not_in'),                  $._expression)),
+      prec.left(6, seq($._expression, choice('in', 'not_in', '!in'),           $._expression)),
       prec.left(7, seq($._expression, choice('bit_shift_left', 'bit_shift_right'), $._expression)),
       prec.left(8, seq($._expression, choice('+', '-'),                        $._expression)),
       prec.left(9, seq($._expression, choice('*', '/', '%'),                   $._expression)),
@@ -485,7 +508,7 @@ module.exports = grammar({
     new_expression: $ => prec.right(seq(
       'new',
       '(',
-      field('type', $.identifier),
+      field('type', $.type),
       ')',
       optional(seq('{', optional(seq($.struct_field, repeat(seq(',', $.struct_field)))), '}')),
     )),
@@ -514,12 +537,17 @@ module.exports = grammar({
     // Types
     type: $ => choice(
       $.primitive_type,
+      $.func_type,
       $.array_type,
       $.map_type,
       $.pointer_type,
       $.wildcard_type,
+      $.qualified_type,
       $.identifier,  // user-defined types
     ),
+
+    // Module-qualified type: models.Task, types.Status
+    qualified_type: $ => prec(2, seq($.identifier, '.', $.identifier)),
 
     wildcard_type: $ => '?',
 
@@ -528,18 +556,31 @@ module.exports = grammar({
       'uint', 'u8', 'u16', 'u32', 'u64', 'u128', 'u256',
       'float', 'f32', 'f64',
       'bool', 'char', 'byte', 'string',
-      'func',
     ),
+
+    // Function type: func, func(int, int) -> int, func(&int)
+    func_type: $ => prec.right(seq(
+      'func',
+      optional(seq(
+        '(',
+        optional(seq($._func_param_type, repeat(seq(',', $._func_param_type)))),
+        ')',
+      )),
+      optional(seq('->', $.type)),
+    )),
+
+    _func_param_type: $ => seq(optional('&'), $.type),
 
     array_type: $ => seq(
       '[',
       $.type,
-      optional(seq(',', $.integer)),
+      optional(seq(',', choice($.integer, $.identifier))),
       ']',
     ),
 
+    // The `map` keyword is optional in type position: [K:V] == map[K:V]
     map_type: $ => seq(
-      'map',
+      optional('map'),
       '[',
       $.type,
       ':',
