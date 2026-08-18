@@ -26,6 +26,7 @@ module.exports = grammar({
       $.using_statement,
       $.import_and_use_statement,
       $.variable_declaration,
+      $.alias_declaration,
       $.function_declaration,
       $.struct_declaration,
       $.enum_declaration,
@@ -82,6 +83,15 @@ module.exports = grammar({
       ),
     ),
 
+    // Type alias
+    alias_declaration: $ => seq(
+      optional('private'),
+      'alias',
+      field('name', $.identifier),
+      '=',
+      field('type', $.type),
+    ),
+
     // Variable declaration
     variable_declaration: $ => seq(
       optional('private'),
@@ -93,6 +103,7 @@ module.exports = grammar({
 
     // Function declaration
     function_declaration: $ => seq(
+      repeat($.attribute),
       optional('private'),
       'do',
       field('name', $.identifier),
@@ -112,9 +123,12 @@ module.exports = grammar({
       optional('&'),
       field('name', $.identifier),
       repeat(seq(',', optional('&'), field('name', $.identifier))),
-      field('type', $.type),
+      field('type', choice($.type, $.type_parameter)),
       optional(seq('=', $._expression)),
     ),
+
+    // Type parameter annotation: do make(T <?>)
+    type_parameter: $ => seq('<', '?', '>'),
 
     return_types: $ => choice(
       $.type,
@@ -139,7 +153,9 @@ module.exports = grammar({
 
     field_declaration: $ => seq(
       field('name', $.identifier),
+      repeat(seq(',', field('name', $.identifier))),
       field('type', $.type),
+      optional(seq('=', field('default', $._expression))),
     ),
 
     // Enum declaration
@@ -155,7 +171,18 @@ module.exports = grammar({
 
     enum_value: $ => seq(
       $.identifier,
-      optional(seq('=', $._expression)),
+      optional(choice(
+        $.variant_payload,
+        seq('=', $._expression),
+      )),
+    ),
+
+    // Tagged enum payload: Circle(float), Rect(float, float)
+    variant_payload: $ => seq(
+      '(',
+      $.type,
+      repeat(seq(',', $.type)),
+      ')',
     ),
 
     attribute: $ => seq(
@@ -180,7 +207,7 @@ module.exports = grammar({
     ),
 
     otherwise_clause: $ => seq(
-      'otherwise',
+      choice('otherwise', 'else'),
       $.block,
     ),
 
@@ -286,6 +313,7 @@ module.exports = grammar({
       $.call_expression,
       $.cast_expression,
       $.member_expression,
+      $.implicit_selector,
       $.index_expression,
       $.unary_expression,
       $.postfix_expression,
@@ -387,9 +415,18 @@ module.exports = grammar({
     call_expression: $ => prec(11, seq(
       field('function', $._expression),
       '(',
-      optional(seq($._expression, repeat(seq(',', $._expression)))),
+      optional(seq($._argument, repeat(seq(',', $._argument)))),
       ')',
     )),
+
+    _argument: $ => choice($.named_argument, $._expression),
+
+    // Named argument at a call site: connect(host: "localhost")
+    named_argument: $ => seq(
+      field('name', $.identifier),
+      ':',
+      field('value', $._expression),
+    ),
 
     // cast(value, type) or cast(value, [type])
     cast_expression: $ => prec(11, seq(
@@ -399,6 +436,12 @@ module.exports = grammar({
       ',',
       choice($.array_type, $.type),
       ')',
+    )),
+
+    // Implicit enum selector: .NORTH, where the enum type is known from context
+    implicit_selector: $ => prec(12, seq(
+      '.',
+      field('variant', $.identifier),
     )),
 
     member_expression: $ => prec.left(12, seq(

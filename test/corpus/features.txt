@@ -1,0 +1,234 @@
+===================================
+Attribute on a function declaration
+===================================
+
+#discard
+do log(msg string) -> int {
+    return 0
+}
+
+---
+
+(source_file
+  (function_declaration
+    (attribute
+      name: (identifier))
+    name: (identifier)
+    (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type
+          (primitive_type))))
+    (return_types
+      (type
+        (primitive_type)))
+    (block
+      (return_statement
+        (number
+          (integer))))))
+
+====================
+Type alias
+====================
+
+alias Meters = float
+private alias InternalID = int
+
+---
+
+(source_file
+  (alias_declaration
+    name: (identifier)
+    type: (type
+      (primitive_type)))
+  (alias_declaration
+    name: (identifier)
+    type: (type
+      (primitive_type))))
+
+==============================
+else as an alias for otherwise
+==============================
+
+do main() {
+    if x > 1 {
+        println("a")
+    } else {
+        println("b")
+    }
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (if_statement
+        (binary_expression
+          (identifier)
+          (number
+            (integer)))
+        (block
+          (expression_statement
+            (call_expression
+              function: (identifier)
+              (string
+                (string_content)))))
+        (otherwise_clause
+          (block
+            (expression_statement
+              (call_expression
+                function: (identifier)
+                (string
+                  (string_content))))))))))
+
+==================================
+Tagged enum variants with payloads
+==================================
+
+const Shape enum {
+    Circle(float)
+    Rect(float, float)
+    Point
+}
+
+---
+
+(source_file
+  (enum_declaration
+    name: (identifier)
+    (enum_value
+      (identifier)
+      (variant_payload
+        (type
+          (primitive_type))))
+    (enum_value
+      (identifier)
+      (variant_payload
+        (type
+          (primitive_type))
+        (type
+          (primitive_type))))
+    (enum_value
+      (identifier))))
+
+====================
+Type parameter
+====================
+
+do make(T <?>) -> ^? {
+    return new(T)
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type_parameter)))
+    (return_types
+      (type
+        (pointer_type
+          (type
+            (wildcard_type)))))
+    (block
+      (return_statement
+        (new_expression
+          type: (identifier))))))
+
+===========================
+Struct field default values
+===========================
+
+const Config struct {
+    host string = "localhost"
+    x, y int = 0
+}
+
+---
+
+(source_file
+  (struct_declaration
+    name: (identifier)
+    (field_declaration
+      name: (identifier)
+      type: (type
+        (primitive_type))
+      default: (string
+        (string_content)))
+    (field_declaration
+      name: (identifier)
+      name: (identifier)
+      type: (type
+        (primitive_type))
+      default: (number
+        (integer)))))
+
+======================
+Implicit enum selector
+======================
+
+do main() {
+    mut dir Direction = .NORTH
+    dir = .SOUTH
+    when dir {
+        is .NORTH { println("n") }
+    }
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (type
+          (identifier))
+        (implicit_selector
+          variant: (identifier)))
+      (assignment_statement
+        (identifier)
+        (implicit_selector
+          variant: (identifier)))
+      (when_statement
+        (identifier)
+        (is_clause
+          (implicit_selector
+            variant: (identifier))
+          (block
+            (expression_statement
+              (call_expression
+                function: (identifier)
+                (string
+                  (string_content))))))))))
+
+==============================
+Named arguments at a call site
+==============================
+
+do main() {
+    connect(host: "localhost", verbose: true)
+}
+
+---
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (expression_statement
+        (call_expression
+          function: (identifier)
+          (named_argument
+            name: (identifier)
+            value: (string
+              (string_content)))
+          (named_argument
+            name: (identifier)
+            value: (boolean)))))))
