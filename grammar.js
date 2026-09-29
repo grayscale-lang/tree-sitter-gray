@@ -9,6 +9,10 @@ module.exports = grammar({
 
   word: $ => $.identifier,
 
+  externals: $ => [
+    $._same_line_operand,
+  ],
+
   conflicts: $ => [
     [$.struct_literal, $._expression],
     [$.variable_declaration],
@@ -16,10 +20,11 @@ module.exports = grammar({
     [$.block, $.array_literal],
     [$.expression_statement, $.array_literal],
     [$.named_return, $.type],
+    [$.or_return_expression],
   ],
 
   rules: {
-    source_file: $ => repeat($._statement),
+    source_file: $ => repeat(choice($._statement, ';')),
 
     _statement: $ => choice(
       $.import_statement,
@@ -45,8 +50,9 @@ module.exports = grammar({
       $.block,
     ),
 
-    // Import statements
+    // Import statements. `extern import "stdio.h"` imports a C header.
     import_statement: $ => seq(
+      optional('extern'),
       'import',
       $._import_item,
       repeat(seq(',', $._import_item)),
@@ -60,8 +66,7 @@ module.exports = grammar({
 
     import_path: $ => choice(
       seq('@', $.identifier),           // @std
-      seq('"', /[^"]+/, '"'),           // "path/to/module"
-      prec(2, seq('c', '"', /[^"]+/, '"')),  // c"header.h"
+      seq('"', /[^"]+/, '"'),           // "path/to/module" or "header.h"
     ),
 
     using_statement: $ => seq(
@@ -91,6 +96,7 @@ module.exports = grammar({
     // default. The keyword-less form requires a type annotation so it cannot be
     // confused with a plain assignment.
     variable_declaration: $ => seq(
+      repeat($._attribute),
       optional('private'),
       choice(
         seq(
@@ -154,18 +160,21 @@ module.exports = grammar({
     // Struct declaration
     struct_declaration: $ => seq(
       repeat($._attribute),
+      optional('private'),
       'const',
       field('name', $.identifier),
       'struct',
       '{',
-      repeat(choice($.field_declaration, $.function_declaration)),
+      repeat(choice($.field_declaration, $.function_declaration, ';')),
       '}',
     ),
 
+    // A raw string after the type is a field tag: name string `json:"Name"`
     field_declaration: $ => seq(
       field('name', $.identifier),
       repeat(seq(',', field('name', $.identifier))),
       field('type', $.type),
+      optional(field('tag', $.raw_string)),
       optional(seq('=', field('default', $._expression))),
       optional(','),
     ),
@@ -173,11 +182,12 @@ module.exports = grammar({
     // Enum declaration
     enum_declaration: $ => seq(
       repeat($._attribute),
+      optional('private'),
       'const',
       field('name', $.identifier),
       'enum',
       '{',
-      repeat($.enum_value),
+      repeat(choice($.enum_value, ';')),
       '}',
     ),
 
@@ -329,7 +339,7 @@ module.exports = grammar({
 
     block: $ => seq(
       '{',
-      repeat($._statement),
+      repeat(choice($._statement, ';')),
       '}',
     ),
 
@@ -355,6 +365,7 @@ module.exports = grammar({
       $.binary_expression,
       $.grouped_expression,
       $.new_expression,
+      $.extern_member,
       $.range_expression,
       $.or_return_expression,
       $.func_ref,
@@ -374,7 +385,10 @@ module.exports = grammar({
       /0o[0-7_]+/,
     ),
 
-    float: $ => /[0-9][0-9_]*\.[0-9][0-9_]*/,
+    float: $ => choice(
+      /[0-9][0-9_]*\.[0-9][0-9_]*([eE][+-]?[0-9][0-9_]*)?/,
+      /[0-9][0-9_]*[eE][+-]?[0-9][0-9_]*/,
+    ),
 
     string: $ => seq(
       '"',
@@ -543,10 +557,23 @@ module.exports = grammar({
       ')',
     ),
 
+    // Fallback values must start on the same line as `or_return`; the external
+    // scanner decides that, since a following-line statement is not a fallback.
     or_return_expression: $ => prec.right(seq(
       $._expression,
       'or_return',
-      optional($._expression),
+      optional(seq(
+        $._same_line_operand,
+        $._expression,
+        repeat(prec.dynamic(1, seq(',', $._expression))),
+      )),
+    )),
+
+    // C interop access: extern.puts, extern.EOF
+    extern_member: $ => prec.left(12, seq(
+      'extern',
+      '.',
+      field('property', $.identifier),
     )),
 
     func_ref: $ => seq(
@@ -573,10 +600,10 @@ module.exports = grammar({
     wildcard_type: $ => '?',
 
     primitive_type: $ => choice(
-      'int', 'i8', 'i16', 'i32', 'i64', 'i128', 'i256',
-      'uint', 'u8', 'u16', 'u32', 'u64', 'u128', 'u256',
-      'float', 'f32', 'f64',
-      'bool', 'char', 'byte', 'string',
+      'i8', 'i16', 'i32', 'i64', 'i128', 'i256',
+      'u8', 'u16', 'u32', 'u64', 'u128', 'u256',
+      'f32', 'f64',
+      'bool', 'char', 'string',
     ),
 
     // Function type: func, func(int, int) -> int, func(&int)
@@ -587,7 +614,10 @@ module.exports = grammar({
         optional(seq($._func_param_type, repeat(seq(',', $._func_param_type)))),
         ')',
       )),
-      optional(seq('->', $.type)),
+      optional(seq('->', choice(
+        $.type,
+        seq('(', $.type, repeat(seq(',', $.type)), ')'),
+      ))),
     )),
 
     _func_param_type: $ => seq(optional('&'), $.type),

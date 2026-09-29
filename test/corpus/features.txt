@@ -3,7 +3,7 @@ Attribute on a function declaration
 ===================================
 
 #discard
-do log(msg string) -> int {
+do log(msg string) -> i64 {
     return 0
 }
 
@@ -31,8 +31,8 @@ do log(msg string) -> int {
 Type alias
 ====================
 
-alias Meters = float
-private alias InternalID = int
+alias Meters = f64
+private alias InternalID = i64
 
 ---
 
@@ -88,8 +88,8 @@ Tagged enum variants with payloads
 ==================================
 
 const Shape enum {
-    Circle(float)
-    Rect(float, float)
+    Circle(f64)
+    Rect(f64, f64)
     Point
 }
 
@@ -147,7 +147,7 @@ Struct field default values
 
 const Config struct {
     host string = "localhost"
-    x, y int = 0
+    x, y i64 = 0
 }
 
 ---
@@ -240,7 +240,7 @@ Multi-value declaration and assignment
 
 do main() {
     mut a, b = pair()
-    mut x int, y int = pair(1, 2)
+    mut x i64, y i64 = pair(1, 2)
     mut v, _ = get()
     c, d = pair()
 }
@@ -284,7 +284,7 @@ do main() {
 Typed func signature
 ====================
 
-do apply(f func(int, int) -> int, g func(&int)) {
+do apply(f func(i64, i64) -> i64, g func(&i64)) {
     return
 }
 
@@ -318,7 +318,7 @@ Map type without the map keyword
 ================================
 
 do main() {
-    mut ages [string:int] = {"a": 1}
+    mut ages [string:i64] = {"a": 1}
 }
 
 ---
@@ -370,10 +370,10 @@ do main() {
 Named array size and new with composite type
 ============================================
 
-const arr [int, N] = {1, 2, 3}
+const arr [i64, N] = {1, 2, 3}
 
 do main() {
-    mut p = new([int])
+    mut p = new([i64])
 }
 
 ---
@@ -469,8 +469,8 @@ const Color enum {
 }
 
 const P struct {
-    x int,
-    y int,
+    x i64,
+    y i64,
 }
 
 ---
@@ -538,8 +538,8 @@ do main() {
 Keyword-less variable declaration
 ==============================
 
-count int = 0
-mut a, b int = 1, 2
+count i64 = 0
+mut a, b i64 = 1, 2
 
 ---
 
@@ -605,7 +605,7 @@ Single-line attribute container
 ==============================
 
 #[doc("x"), deprecated]
-fn old() -> int {
+fn old() -> i64 {
     return 0
 }
 
@@ -626,3 +626,315 @@ fn old() -> int {
       (return_statement
         (number
           (integer))))))
+
+================================================================================
+Semicolon separators
+================================================================================
+
+const Point struct { x i64; y i64 }
+const Color enum { RED; GREEN; BLUE }
+do add(a i64, b i64) -> i64 { mut sum i64 = a + b; return sum }
+mut first i64 = 1; mut second i64 = 2
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (struct_declaration
+    name: (identifier)
+    (field_declaration
+      name: (identifier)
+      type: (type
+        (primitive_type)))
+    (field_declaration
+      name: (identifier)
+      type: (type
+        (primitive_type))))
+  (enum_declaration
+    name: (identifier)
+    (enum_value
+      (identifier))
+    (enum_value
+      (identifier))
+    (enum_value
+      (identifier)))
+  (function_declaration
+    name: (identifier)
+    (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type
+          (primitive_type)))
+      (parameter
+        name: (identifier)
+        type: (type
+          (primitive_type))))
+    (return_types
+      (type
+        (primitive_type)))
+    (block
+      (variable_declaration
+        (identifier)
+        (type
+          (primitive_type))
+        (binary_expression
+          (identifier)
+          (identifier)))
+      (return_statement
+        (identifier))))
+  (variable_declaration
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (integer)))
+  (variable_declaration
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (integer))))
+
+================================================================================
+Struct field tags
+================================================================================
+
+#json
+const User struct {
+    name string `json:"Name"`
+    age i64 `json:"Age"`
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (struct_declaration
+    (attribute
+      name: (identifier))
+    name: (identifier)
+    (field_declaration
+      name: (identifier)
+      type: (type
+        (primitive_type))
+      tag: (raw_string))
+    (field_declaration
+      name: (identifier)
+      type: (type
+        (primitive_type))
+      tag: (raw_string))))
+
+================================================================================
+Scientific notation floats
+================================================================================
+
+mut a f64 = 1e3
+mut b f64 = 3.0e38
+mut c f64 = 2.5E-4
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (float)))
+  (variable_declaration
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (float)))
+  (variable_declaration
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (float))))
+
+================================================================================
+Func type with multiple return values
+================================================================================
+
+do call(n i64, f func(i64) -> (i64, string)) -> string {
+    return ""
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (parameter_list
+      (parameter
+        name: (identifier)
+        type: (type
+          (primitive_type)))
+      (parameter
+        name: (identifier)
+        type: (type
+          (func_type
+            (type
+              (primitive_type))
+            (type
+              (primitive_type))
+            (type
+              (primitive_type))))))
+    (return_types
+      (type
+        (primitive_type)))
+    (block
+      (return_statement
+        (string)))))
+
+================================================================================
+or_return with fallback values on the same line only
+================================================================================
+
+do run() -> (i64, Error) {
+    mut c = one() or_return
+    _ = two() or_return
+    two() or_return
+    mut n = load() or_return 0, error("failed")
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (return_types
+      (named_return
+        type: (type
+          (primitive_type)))
+      (named_return
+        type: (type
+          (identifier))))
+    (block
+      (variable_declaration
+        (identifier)
+        (or_return_expression
+          (call_expression
+            function: (identifier))))
+      (assignment_statement
+        (identifier)
+        (or_return_expression
+          (call_expression
+            function: (identifier))))
+      (expression_statement
+        (or_return_expression
+          (call_expression
+            function: (identifier))))
+      (variable_declaration
+        (identifier)
+        (or_return_expression
+          (call_expression
+            function: (identifier))
+          (number
+            (integer))
+          (call_expression
+            function: (identifier)
+            (string
+              (string_content))))))))
+
+================================================================================
+Attribute on a file-scope variable
+================================================================================
+
+#doc("Maximum number of retries")
+const MAX_RETRIES i64 = 5
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (variable_declaration
+    (attribute
+      name: (identifier)
+      (string
+        (string_content)))
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (integer))))
+
+================================================================================
+extern import and extern calls
+================================================================================
+
+extern import "stdio.h", "stdlib.h"
+
+do main() {
+    extern.puts("hello")
+    mut eof i64 = extern.EOF
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (import_statement
+    (import_path)
+    (import_path))
+  (function_declaration
+    name: (identifier)
+    (block
+      (expression_statement
+        (call_expression
+          function: (extern_member
+            property: (identifier))
+          (string
+            (string_content))))
+      (variable_declaration
+        (identifier)
+        (type
+          (primitive_type))
+        (extern_member
+          property: (identifier))))))
+
+================================================================================
+private struct and enum
+================================================================================
+
+private const Hidden struct {
+    a i64
+}
+
+private const Mode enum {
+    FAST
+    SLOW
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (struct_declaration
+    name: (identifier)
+    (field_declaration
+      name: (identifier)
+      type: (type
+        (primitive_type))))
+  (enum_declaration
+    name: (identifier)
+    (enum_value
+      (identifier))
+    (enum_value
+      (identifier))))
+
+================================================================================
+error_code attribute on an enum
+================================================================================
+
+#error_code
+const NetError enum {
+    TIMEOUT
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (enum_declaration
+    (attribute
+      name: (identifier))
+    name: (identifier)
+    (enum_value
+      (identifier))))
