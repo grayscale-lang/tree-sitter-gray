@@ -938,3 +938,165 @@ const NetError enum {
     name: (identifier)
     (enum_value
       (identifier))))
+
+================================================================================
+or_panic with and without a message
+================================================================================
+
+do main() {
+    mut port = lookup("port") or_panic
+    const n = to_i64(text) or_panic "config must hold a port number"
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (or_panic_expression
+          (call_expression
+            function: (identifier)
+            (string
+              (string_content)))))
+      (variable_declaration
+        (identifier)
+        (or_panic_expression
+          (call_expression
+            function: (identifier)
+            (identifier))
+          (string
+            (string_content)))))))
+
+================================================================================
+or_default with one and several fallbacks
+================================================================================
+
+do main() {
+    mut port = to_i64(text) or_default 8080
+    mut low, high = bounds(text) or_default 0, 100
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    name: (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (or_default_expression
+          (call_expression
+            function: (identifier)
+            (identifier))
+          (number
+            (integer))))
+      (variable_declaration
+        (identifier)
+        (identifier)
+        (or_default_expression
+          (call_expression
+            function: (identifier)
+            (identifier))
+          (number
+            (integer))
+          (number
+            (integer)))))))
+
+================================================================================
+unsafe block and unsafe functions
+================================================================================
+
+private unsafe do bump(counter ^i64) {
+    unsafe {
+        counter^ += 1
+    }
+}
+
+unsafe do poke() {
+}
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type
+          (pointer_type
+            (type
+              (primitive_type))))))
+    (block
+      (unsafe_block
+        (block
+          (assignment_statement
+            (postfix_expression
+              (identifier))
+            (number
+              (integer)))))))
+  (function_declaration
+    (identifier)
+    (block)))
+
+================================================================================
+Multi-variable declarations on one line
+================================================================================
+
+const LIMIT_LOW, LIMIT_HIGH i64 = 1, 99
+small_a, small_b f32 = 1.5
+zero_a, zero_b string
+mut first, second i64 = two()
+mut kept, _ = one(), one()
+a i64, b f64 = f()
+
+--------------------------------------------------------------------------------
+
+(source_file
+  (variable_declaration
+    (identifier)
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (integer))
+    (number
+      (integer)))
+  (variable_declaration
+    (identifier)
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (float)))
+  (variable_declaration
+    (identifier)
+    (identifier)
+    (type
+      (primitive_type)))
+  (variable_declaration
+    (identifier)
+    (identifier)
+    (type
+      (primitive_type))
+    (call_expression
+      (identifier)))
+  (variable_declaration
+    (identifier)
+    (identifier)
+    (call_expression
+      (identifier))
+    (call_expression
+      (identifier)))
+  (variable_declaration
+    (identifier)
+    (type
+      (primitive_type))
+    (identifier)
+    (type
+      (primitive_type))
+    (call_expression
+      (identifier))))

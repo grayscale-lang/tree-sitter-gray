@@ -45,6 +45,7 @@ module.exports = grammar({
       $.break_statement,
       $.continue_statement,
       $.ensure_statement,
+      $.unsafe_block,
       $.assignment_statement,
       $.expression_statement,
       $.block,
@@ -107,8 +108,14 @@ module.exports = grammar({
         ),
         seq(
           $.identifier,
-          $.type,
-          repeat(seq(',', $.identifier, optional($.type))),
+          choice(
+            seq($.type, repeat(seq(',', $.identifier, optional($.type)))),
+            seq(
+              repeat1(seq(',', $.identifier)),
+              $.type,
+              repeat(seq(',', $.identifier, optional($.type))),
+            ),
+          ),
         ),
       ),
       optional(seq('=', $._expression, repeat(seq(',', $._expression)))),
@@ -118,6 +125,7 @@ module.exports = grammar({
     function_declaration: $ => seq(
       repeat($._attribute),
       optional('private'),
+      optional('unsafe'),
       choice('do', 'fn'),
       field('name', $.identifier),
       '(',
@@ -326,6 +334,9 @@ module.exports = grammar({
       $.call_expression,
     )),
 
+    // Unsafe block: raw(), mem, threads, and extern calls live inside it
+    unsafe_block: $ => seq('unsafe', $.block),
+
     // Assignment
     assignment_statement: $ => seq(
       $._expression,
@@ -368,6 +379,8 @@ module.exports = grammar({
       $.extern_member,
       $.range_expression,
       $.or_return_expression,
+      $.or_panic_expression,
+      $.or_default_expression,
       $.func_ref,
     ),
 
@@ -567,6 +580,22 @@ module.exports = grammar({
         $._expression,
         repeat(prec.dynamic(1, seq(',', $._expression))),
       )),
+    )),
+
+    // An optional panic message must start on the same line as `or_panic`.
+    or_panic_expression: $ => prec.right(seq(
+      $.call_expression,
+      'or_panic',
+      optional(seq($._same_line_operand, $._expression)),
+    )),
+
+    // Fallback values are required and start on the same line as `or_default`.
+    or_default_expression: $ => prec.right(seq(
+      $.call_expression,
+      'or_default',
+      $._same_line_operand,
+      $._expression,
+      repeat(prec.dynamic(1, seq(',', $._expression))),
     )),
 
     // C interop access: extern.puts, extern.EOF
