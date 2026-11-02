@@ -833,6 +833,10 @@
           "named": true
         },
         {
+          "type": "labeled_statement",
+          "named": true
+        },
+        {
           "type": "loop_statement",
           "named": true
         },
@@ -867,6 +871,22 @@
     "type": "boolean",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "break_statement",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    }
   },
   {
     "type": "call_expression",
@@ -1246,6 +1266,22 @@
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "continue_statement",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -2705,6 +2741,44 @@
         },
         {
           "type": "unary_expression",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "labeled_statement",
+    "named": true,
+    "fields": {
+      "label": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "as_long_as_statement",
+          "named": true
+        },
+        {
+          "type": "for_each_statement",
+          "named": true
+        },
+        {
+          "type": "for_statement",
+          "named": true
+        },
+        {
+          "type": "loop_statement",
           "named": true
         }
       ]
@@ -4301,6 +4375,10 @@
           "named": true
         },
         {
+          "type": "labeled_statement",
+          "named": true
+        },
+        {
           "type": "loop_statement",
           "named": true
         },
@@ -4565,18 +4643,9 @@
         {
           "type": "qualified_type",
           "named": true
-        },
-        {
-          "type": "wildcard_type",
-          "named": true
         }
       ]
     }
-  },
-  {
-    "type": "type_parameter",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "unary_expression",
@@ -4997,11 +5066,6 @@
     }
   },
   {
-    "type": "wildcard_type",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "!",
     "named": false
   },
@@ -5142,10 +5206,6 @@
     "named": false
   },
   {
-    "type": "?",
-    "named": false
-  },
-  {
     "type": "@",
     "named": false
   },
@@ -5211,8 +5271,8 @@
     "named": false
   },
   {
-    "type": "break_statement",
-    "named": true
+    "type": "break",
+    "named": false
   },
   {
     "type": "case",
@@ -5236,8 +5296,8 @@
     "named": false
   },
   {
-    "type": "continue_statement",
-    "named": true
+    "type": "continue",
+    "named": false
   },
   {
     "type": "default",
@@ -5245,6 +5305,10 @@
   },
   {
     "type": "defer",
+    "named": false
+  },
+  {
+    "type": "distinct",
     "named": false
   },
   {
@@ -5422,6 +5486,10 @@
   {
     "type": "true",
     "named": false
+  },
+  {
+    "type": "type_parameter",
+    "named": true
   },
   {
     "type": "u128",

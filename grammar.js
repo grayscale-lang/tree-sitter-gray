@@ -21,6 +21,7 @@ module.exports = grammar({
     [$.expression_statement, $.array_literal],
     [$.named_return, $.type],
     [$.or_return_expression],
+    [$.labeled_statement, $._expression],
   ],
 
   rules: {
@@ -36,6 +37,7 @@ module.exports = grammar({
       $.struct_declaration,
       $.enum_declaration,
       $.if_statement,
+      $.labeled_statement,
       $.for_statement,
       $.for_each_statement,
       $.as_long_as_statement,
@@ -87,6 +89,7 @@ module.exports = grammar({
     // Type alias
     alias_declaration: $ => seq(
       optional('private'),
+      optional('distinct'),
       'alias',
       field('name', $.identifier),
       '=',
@@ -152,8 +155,8 @@ module.exports = grammar({
       seq(field('name', $.identifier), '=', $._expression),
     ),
 
-    // Type parameter annotation: do make(T <?>)
-    type_parameter: $ => seq('<', '?', '>'),
+    // Type parameter: do make(T generic)
+    type_parameter: $ => 'generic',
 
     return_types: $ => choice(
       $.type,
@@ -258,6 +261,13 @@ module.exports = grammar({
       $.block,
     ),
 
+    // A label goes before a loop: outer: for y in range(0, h) { }
+    labeled_statement: $ => seq(
+      field('label', $.identifier),
+      ':',
+      choice($.for_statement, $.for_each_statement, $.as_long_as_statement, $.loop_statement),
+    ),
+
     for_statement: $ => choice(
       prec(2, seq(
         'for',
@@ -324,9 +334,10 @@ module.exports = grammar({
       optional(seq($._expression, repeat(seq(',', $._expression)))),
     )),
 
-    break_statement: $ => 'break',
+    // A loop label must start on the same line as the keyword.
+    break_statement: $ => seq('break', optional(seq($._same_line_operand, field('label', $.identifier)))),
 
-    continue_statement: $ => 'continue',
+    continue_statement: $ => seq('continue', optional(seq($._same_line_operand, field('label', $.identifier)))),
 
     // Ensure statement (runs on function exit). `defer` is an alias.
     ensure_statement: $ => prec(11, seq(
@@ -618,15 +629,12 @@ module.exports = grammar({
       $.array_type,
       $.map_type,
       $.pointer_type,
-      $.wildcard_type,
       $.qualified_type,
       $.identifier,  // user-defined types
     ),
 
     // Module-qualified type: models.Task, types.Status
     qualified_type: $ => prec(2, seq($.identifier, '.', $.identifier)),
-
-    wildcard_type: $ => '?',
 
     primitive_type: $ => choice(
       'i8', 'i16', 'i32', 'i64', 'i128', 'i256',

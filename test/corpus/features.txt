@@ -114,10 +114,10 @@ const Shape enum {
       (identifier))))
 
 ====================
-Type parameter
+Generic type parameter
 ====================
 
-do make(T <?>) -> ^? {
+do make(T generic) -> ^T {
     return new(T)
 }
 
@@ -134,7 +134,7 @@ do make(T <?>) -> ^? {
       (type
         (pointer_type
           (type
-            (wildcard_type)))))
+            (identifier)))))
     (block
       (return_statement
         (new_expression
@@ -1100,3 +1100,163 @@ a i64, b f64 = f()
       (primitive_type))
     (call_expression
       (identifier))))
+
+====================
+Distinct alias
+====================
+
+distinct alias UserId = i64
+private distinct alias OrderId = i64
+
+---
+
+(source_file
+  (alias_declaration
+    (identifier)
+    (type
+      (primitive_type)))
+  (alias_declaration
+    (identifier)
+    (type
+      (primitive_type))))
+
+====================
+Labeled loops with break and continue
+====================
+
+do main() {
+    outer: for y in range(0, 3) {
+        inner: for_each x in {1, 2} {
+            if x == 1 { continue outer }
+            break outer
+        }
+        tick: loop { break tick }
+        wait: while y < 2 { break wait }
+    }
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (block
+      (labeled_statement
+        (identifier)
+        (for_statement
+          (identifier)
+          (range_expression
+            (number
+              (integer))
+            (number
+              (integer)))
+          (block
+            (labeled_statement
+              (identifier)
+              (for_each_statement
+                (identifier)
+                (array_literal
+                  (number
+                    (integer))
+                  (number
+                    (integer)))
+                (block
+                  (if_statement
+                    (binary_expression
+                      (identifier)
+                      (number
+                        (integer)))
+                    (block
+                      (continue_statement
+                        (identifier))))
+                  (break_statement
+                    (identifier)))))
+            (labeled_statement
+              (identifier)
+              (loop_statement
+                (block
+                  (break_statement
+                    (identifier)))))
+            (labeled_statement
+              (identifier)
+              (as_long_as_statement
+                (binary_expression
+                  (identifier)
+                  (number
+                    (integer)))
+                (block
+                  (break_statement
+                    (identifier)))))))))))
+
+====================
+Generic function with several type parameters
+====================
+
+do pair(a_kind generic, b_kind generic, a a_kind, b b_kind) -> (a_kind, b_kind) {
+    return a, b
+}
+
+do main() {
+    mut n = identity(i64, 42)
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type_parameter))
+      (parameter
+        (identifier)
+        (type_parameter))
+      (parameter
+        (identifier)
+        (type
+          (identifier)))
+      (parameter
+        (identifier)
+        (type
+          (identifier))))
+    (return_types
+      (named_return
+        (type
+          (identifier)))
+      (named_return
+        (type
+          (identifier))))
+    (block
+      (return_statement
+        (identifier)
+        (identifier))))
+  (function_declaration
+    (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (call_expression
+          (identifier)
+          (identifier)
+          (number
+            (integer)))))))
+
+====================
+Define attribute
+====================
+
+#define
+const LIMIT i64 = 10
+
+---
+
+(source_file
+  (variable_declaration
+    (attribute
+      (identifier))
+    (identifier)
+    (type
+      (primitive_type))
+    (number
+      (integer))))

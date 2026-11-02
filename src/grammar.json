@@ -60,6 +60,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "labeled_statement"
+        },
+        {
+          "type": "SYMBOL",
           "name": "for_statement"
         },
         {
@@ -288,6 +292,18 @@
             {
               "type": "STRING",
               "value": "private"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "distinct"
             },
             {
               "type": "BLANK"
@@ -801,21 +817,8 @@
       ]
     },
     "type_parameter": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "STRING",
-          "value": "<"
-        },
-        {
-          "type": "STRING",
-          "value": "?"
-        },
-        {
-          "type": "STRING",
-          "value": ">"
-        }
-      ]
+      "type": "STRING",
+      "value": "generic"
     },
     "return_types": {
       "type": "CHOICE",
@@ -1437,6 +1440,44 @@
         }
       ]
     },
+    "labeled_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "FIELD",
+          "name": "label",
+          "content": {
+            "type": "SYMBOL",
+            "name": "identifier"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ":"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "for_statement"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "for_each_statement"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "as_long_as_statement"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "loop_statement"
+            }
+          ]
+        }
+      ]
+    },
     "for_statement": {
       "type": "CHOICE",
       "members": [
@@ -1807,12 +1848,72 @@
       }
     },
     "break_statement": {
-      "type": "STRING",
-      "value": "break"
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "break"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_same_line_operand"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "label",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "identifier"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
     },
     "continue_statement": {
-      "type": "STRING",
-      "value": "continue"
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "continue"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_same_line_operand"
+                },
+                {
+                  "type": "FIELD",
+                  "name": "label",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "identifier"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
     },
     "ensure_statement": {
       "type": "PREC",
@@ -3381,10 +3482,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "wildcard_type"
-        },
-        {
-          "type": "SYMBOL",
           "name": "qualified_type"
         },
         {
@@ -3413,10 +3510,6 @@
           }
         ]
       }
-    },
-    "wildcard_type": {
-      "type": "STRING",
-      "value": "?"
     },
     "primitive_type": {
       "type": "CHOICE",
@@ -3784,6 +3877,10 @@
     ],
     [
       "or_return_expression"
+    ],
+    [
+      "labeled_statement",
+      "_expression"
     ]
   ],
   "precedences": [],
