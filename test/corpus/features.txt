@@ -1260,3 +1260,118 @@ const LIMIT i64 = 10
       (primitive_type))
     (number
       (integer))))
+
+====================
+Trailing commas in struct and map literals
+====================
+
+do main() {
+    mut p Point = Point{
+        x: 1,
+        y: 2,
+    }
+    mut m map[string:i64] = {"a": 1, "b": 2,}
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (block
+      (variable_declaration
+        (identifier)
+        (type
+          (identifier))
+        (struct_literal
+          (identifier)
+          (struct_field
+            (identifier)
+            (number
+              (integer)))
+          (struct_field
+            (identifier)
+            (number
+              (integer)))))
+      (variable_declaration
+        (identifier)
+        (type
+          (map_type
+            (type
+              (primitive_type))
+            (type
+              (primitive_type))))
+        (map_literal
+          (map_entry
+            (string
+              (string_content))
+            (number
+              (integer)))
+          (map_entry
+            (string
+              (string_content))
+            (number
+              (integer))))))))
+
+====================
+Trailing comma in tuple return types
+====================
+
+do pair() -> (i64, string,) {
+    return 1, "a"
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (return_types
+      (named_return
+        (type
+          (primitive_type)))
+      (named_return
+        (type
+          (primitive_type))))
+    (block
+      (return_statement
+        (number
+          (integer))
+        (string
+          (string_content))))))
+
+====================
+Wrapping arithmetic builtins in unsafe
+====================
+
+unsafe do mix(a u8, b u8) -> u8 {
+    return wrap_add(a, wrap_mult(b, 3))
+}
+
+---
+
+(source_file
+  (function_declaration
+    (identifier)
+    (parameter_list
+      (parameter
+        (identifier)
+        (type
+          (primitive_type)))
+      (parameter
+        (identifier)
+        (type
+          (primitive_type))))
+    (return_types
+      (type
+        (primitive_type)))
+    (block
+      (return_statement
+        (call_expression
+          (identifier)
+          (identifier)
+          (call_expression
+            (identifier)
+            (identifier)
+            (number
+              (integer))))))))

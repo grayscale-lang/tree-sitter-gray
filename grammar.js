@@ -160,7 +160,7 @@ module.exports = grammar({
 
     return_types: $ => choice(
       $.type,
-      seq('(', $.named_return, repeat(seq(',', $.named_return)), ')'),
+      seq('(', $.named_return, repeat(seq(',', $.named_return)), optional(','), ')'),
     ),
 
     named_return: $ => seq(
@@ -461,7 +461,7 @@ module.exports = grammar({
     map_literal: $ => seq(
       '{',
       choice(
-        seq($.map_entry, repeat(seq(',', $.map_entry))),
+        seq($.map_entry, repeat(seq(',', $.map_entry)), optional(',')),
         ':',
       ),
       '}',
@@ -476,7 +476,7 @@ module.exports = grammar({
     struct_literal: $ => prec.dynamic(1, seq(
       choice($.identifier, $.member_expression),
       '{',
-      optional(seq($.struct_field, repeat(seq(',', $.struct_field)))),
+      optional(seq($.struct_field, repeat(seq(',', $.struct_field)), optional(','))),
       '}',
     )),
 
